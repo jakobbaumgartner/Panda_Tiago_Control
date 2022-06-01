@@ -1,0 +1,20 @@
+function A = getTransformationA(a,d,alpha,fi)
+
+% getTransformationA - get one step of kinematics
+% --------------------------------------------------------------
+% creates transformation between two Coordinate systems, 
+% based on DH parameters
+
+A = [ co
+
+    
+
+
+
+
+
+]
+
+
+
+end
