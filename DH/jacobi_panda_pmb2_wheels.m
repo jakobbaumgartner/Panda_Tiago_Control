@@ -1,14 +1,12 @@
 function J = jacobi_panda_pmb2_wheels (q)
 
-    w_left = q(1);
-    w_right = q(2);
-    fi1 = q(3);
-    fi2 = q(4);
-    fi3 = q(5);
-    fi4 = q(6);
-    fi5 = q(7);
-    fi6 = q(8);
-    fi7 = q(9);
+    fi1 = q(1);
+    fi2 = q(2);
+    fi3 = q(3);
+    fi4 = q(4);
+    fi5 = q(5);
+    fi6 = q(6);
+    fi7 = q(7);
     
     % OPOMBA
     %
@@ -79,7 +77,7 @@ function J = jacobi_panda_pmb2_wheels (q)
     % joint 6
     a6 = -0.0880;
     d6 = 0;
-    alpha6 = pi/2;
+    alpha6 = pi/2; 
     fi60 = pi;
 
     A56 = getTransformationA(a6, d6, alpha6, fi60 + fi6);
@@ -220,7 +218,7 @@ function J = jacobi_panda_pmb2_wheels (q)
     jo = z;
 
     J(1:3,9) = jp;
-    J(4:6,9) = jo;
+    J(4:6,9) = -jo; % od kje pride minus ??? (popravljeno za ujemanje z Leonovo verzijo ...)
     
  
 end
