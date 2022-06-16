@@ -1,20 +1,10 @@
 function status = base_of_simple_velocity_control_geometric_wheels(x,y)
 
-
 global pub_diff
 global msg_diff
 
-
 pub_diff = rospublisher('/mobile_base_controller/cmd_vel')
 msg_diff = rosmessage(pub_diff)
-
-diff_w_data = zeros(1,100);
-diff_fi_data = zeros(1,100);
-x_data = zeros(1,100);
-y_data = zeros(1,100);
-
-
-
 
 % goal position
 
@@ -65,33 +55,22 @@ while norm([position_basefootprint.X, position_basefootprint.Y] - pos_goal) > ma
     diff_val = [ 0 0 ];
     diff_val(1) = norm(dist);
 
-
-%     [diff_val(2), pos_fi] = gazebo_calc_base_orientation(pos_x,pos_y)
-    [a, pos_fi, diff_val(2)] = calc_base_target_orientation(pos_x, pos_y, pos_goal(1), pos_goal(2), eulZYX(3))
-
-%     disp("Psi relat: " + string(psi_relat))
-    disp("Rotation locat:  " + string(rad2deg(diff_val(2))))
-    disp("Rotation base rotac  " + string(rad2deg(eulZYX(3))))
-    disp("Rotation error  " + string(rad2deg(diff_val(2))))
-
-    disp("X:  " + string(pos_x) + "  Y:  " + string(pos_y))
-%     disp("Angle correction:  " + string(psi_relat + rad2deg(diff_val(2))))
+    [pos_fi, diff_val(2)] = calc_base_target_orientation(pos_x, pos_y, pos_goal(1), pos_goal(2), eulZYX(3));
+% 
+%     disp("Rotation base rotac  " + string(rad2deg(eulZYX(3))))
+%     disp("Rotation error  " + string(rad2deg(diff_val(2))))
+    disp("Base position - > X:  " + string(pos_x) + "  Y:  " + string(pos_y))
          
-    vel = diff_val.*p_vel'
+    vel = diff_val.*p_vel';
 
     % linear speed limit
     if vel(1) > 0.8
-        vel(1) = 0.8
+        vel(1) = 0.8;
     end
 
-
+    % send control message
     msg_diff.Linear.X = vel(1);
     msg_diff.Angular.Z = vel(2);
-
-
-%     hold on
-%     plot(diff_fi_data)
-
     pub_diff.send(msg_diff)
     
     
@@ -101,12 +80,8 @@ while norm([position_basefootprint.X, position_basefootprint.Y] - pos_goal) > ma
     pause(0.01)
     position_basefootprint = gazebo_positions.Pose(2).Position;
     orientation_basefootprint = gazebo_positions.Pose(2).Orientation;
-    eulZYX = quat2eul([orientation_basefootprint.X orientation_basefootprint.Y orientation_basefootprint.Z orientation_basefootprint.W])
+    eulZYX = quat2eul([orientation_basefootprint.X orientation_basefootprint.Y orientation_basefootprint.Z orientation_basefootprint.W]);
 
 end
-
-
-
-
 
 end
