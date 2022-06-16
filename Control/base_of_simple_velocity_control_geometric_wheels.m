@@ -1,4 +1,4 @@
-function status = base_of_simple_velocity_control_geometric_wheels()
+function status = base_of_simple_velocity_control_geometric_wheels(x,y)
 
 
 global pub_diff
@@ -23,7 +23,7 @@ goal_base_2 = [5.4355, 4.0976];
 goal_base_center = [0 0];
 goal_02 = [0 2];
 
-pos_goal = goal_base_1;
+pos_goal = [x,y];
 
 
 % get GAZEBO positions
@@ -39,8 +39,8 @@ pos_y = position_basefootprint.X;
 pos_fi = 999;
 
 % control loop - run until EE position is close
-max_dist = 0.05; % max distnace from end point
-p_vel = [0.1 0.01]'; % speed p constant
+max_dist = 1; % max distnace from end point
+p_vel = [1 1]'; % speed p constant
 
 
 while norm([position_basefootprint.X, position_basefootprint.Y] - pos_goal) > max_dist
@@ -61,27 +61,32 @@ while norm([position_basefootprint.X, position_basefootprint.Y] - pos_goal) > ma
     pos_x = - position_basefootprint.Y;
     pos_y = position_basefootprint.X;
 
-    dist = [pos_x, pos_y] - pos_goal 
+    dist = [pos_x, pos_y] - pos_goal;
     diff_val = [ 0 0 ];
     diff_val(1) = norm(dist);
 
 
 %     [diff_val(2), pos_fi] = gazebo_calc_base_orientation(pos_x,pos_y)
-    [diff_val(2), pos_fi, fi_error] = calc_base_target_orientation(pos_x, pos_y, pos_goal(1), pos_goal(2), eulZYX(3))
+    [a, pos_fi, diff_val(2)] = calc_base_target_orientation(pos_x, pos_y, pos_goal(1), pos_goal(2), eulZYX(3))
 
 %     disp("Psi relat: " + string(psi_relat))
     disp("Rotation locat:  " + string(rad2deg(diff_val(2))))
     disp("Rotation base rotac  " + string(rad2deg(eulZYX(3))))
-    disp("Rotation error  " + string(rad2deg(fi_error)))
+    disp("Rotation error  " + string(rad2deg(diff_val(2))))
 
     disp("X:  " + string(pos_x) + "  Y:  " + string(pos_y))
 %     disp("Angle correction:  " + string(psi_relat + rad2deg(diff_val(2))))
          
-    vel = diff_val .* p_vel;
+    vel = diff_val.*p_vel'
+
+    % linear speed limit
+    if vel(1) > 0.8
+        vel(1) = 0.8
+    end
 
 
     msg_diff.Linear.X = vel(1);
-    msg_diff.Angular.Z = fi_error;
+    msg_diff.Angular.Z = vel(2);
 
 
 %     hold on
